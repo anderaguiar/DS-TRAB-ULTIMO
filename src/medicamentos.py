@@ -1,3 +1,5 @@
+
+# imports arq requirements.txt
 import os
 import pandas as pd
 import numpy as np
@@ -32,12 +34,12 @@ file_names = [i for i in os.listdir(DATA_DIR) if i.endswith('.csv')]
 for i in file_names:
     df = pd.read_csv(os.path.join(DATA_DIR, i))
 
-# tratamento dos dados e mapeamento
+# tratamento dos dados e mapeamento status
 # Remanejamento = 1
 # Entrega Realizada = 2
 # Remanejamento para Malaria = 3
-map_data = {'R': 1, 'ER': 2, 'M': 3}
-df['STATUS'] = df['STATUS'].map(map_data)
+map_data_status = {'R': 1, 'ER': 2, 'M': 3}
+df['STATUS'] = df['STATUS'].map(map_data_status)
 ##print('Alteracao de valores categóricos: \n', df.head(50))
 
 # tratamento dos dados da regiao
@@ -82,8 +84,14 @@ def ver_amostras_das_classes_regiao():
     print('\nAmostra da classe 4 - Sudeste: ', sample_4)
     print('\nAmostra da classe 5 - Sul: ', sample_5)
 
+#nume pandas
+def ver_amostras_das_classes_progsaude():
+    sample_1 = np.where(df.loc[df['PROGSAUDE'] == 1])
+    sample_2 = np.where(df.loc[df['PROGSAUDE'] == 2])
+    print('\nAmostra da classe 1 - COVID-19: ', sample_1)
+    print('\nAmostra da classe 2 - INFLUENZA: ', sample_2)
 
-# quantidade de amostras por classe
+# qtde de amostras por classe status
 def ver_qtde_amostras_por_classe_status():
     vl_remanejamento = len(df.loc[df['STATUS'] == 1])
     vl_entrega_realizada = len(df.loc[df['STATUS'] == 2])
@@ -92,6 +100,7 @@ def ver_qtde_amostras_por_classe_status():
     print('\nAmostra da classe 2 - Entrega Realizada: ', vl_entrega_realizada)
     print('\nAmostra da classe 3 - Remanejamento Malaria: ', vl_remanejamento_malaria)
 
+# qtde das amostras por classe regiao
 def ver_qtde_amostras_por_classe_regiao():
     vl_norte = len(df.loc[df['REGIAO'] == 1])
     vl_nordeste = len(df.loc[df['REGIAO'] == 2])
@@ -104,10 +113,17 @@ def ver_qtde_amostras_por_classe_regiao():
     print('\nAmostra da classe 4 - Sudeste: ', vl_sudeste)
     print('\nAmostra da classe 5 - Sul: ', vl_sul)
 
+# qtde das amostras por classe programa saude
+def ver_qtde_amostras_por_classe_progsaude():
+    vl_covid = len(df.loc[df['REGIAO'] == 1])
+    vl_influenza = len(df.loc[df['REGIAO'] == 2])
+    print('\nAmostra da classe 1 - COVID-19: ', vl_covid)
+    print('\nAmostra da classe 2 - INFLUENZA: ', vl_influenza)
 
-# verifica se existe dados faltantes no conjunto de dados
-dt_feature = df.iloc[:, 6]
-dt_target = df.iloc[:,  3]
+
+# conjunto de dados
+dt_feature = df.iloc[:, 4]
+dt_target = df.iloc[:, 3]
 dt_feature = dt_feature.mask(dt_feature == 1).fillna(dt_feature.mean)
 ##print('DT_FEATURE: ', dt_feature)
 ##print('DT_TARGET: ', dt_target)
@@ -172,7 +188,7 @@ def split_model():
         print('x_train: %d\n y_train %d\n x_test %d\n y_test %d\n' %(len(x_train), len(y_train), len(x_test), len(y_test)))
         print('quantidade de amostras da classe 1: ', len(y_train.loc[y_train == 1]))
         print('quantidade de amostras da classe 2: ', len(y_train.loc[y_train == 2]))
-        print('quantidade de amostras da classe 3: ', len(y_train.loc[y_train == 3]))
+        ##print('quantidade de amostras da classe 3: ', len(y_train.loc[y_train == 3]))
 
 
         # Perceptron
@@ -203,19 +219,25 @@ def split_model():
         print('Vetor accuracy_PC - Media: ', median)
 
 
-
 # chamada das funcoes
 
-##ver_amostras_das_classes_status()
-##ver_amostras_das_classes_regiao()
-##ver_qtde_amostras_por_classe_status()
-##ver_qtde_amostras_por_classe_regiao()
-##ver_dados_faltantes()
+ver_amostras_das_classes_status()
+ver_amostras_das_classes_regiao()
+ver_qtde_amostras_por_classe_status()
+ver_qtde_amostras_por_classe_regiao()
+ver_amostras_das_classes_progsaude()
+ver_qtde_amostras_por_classe_progsaude()
+
+
+
+# chamadas dos graficos plot
 
 ##plot_hist()
 ##target_count()
 ##correlation()
 ##bloxplot()
-split_model()
 
 
+# chamada ML
+
+##split_model()
