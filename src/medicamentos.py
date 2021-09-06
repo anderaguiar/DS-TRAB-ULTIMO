@@ -240,4 +240,4 @@ def split_model():
 
 # chamada ML
 
-split_model()
+##split_model()
