@@ -188,7 +188,7 @@ def split_model():
         print('x_train: %d\n y_train %d\n x_test %d\n y_test %d\n' %(len(x_train), len(y_train), len(x_test), len(y_test)))
         print('quantidade de amostras da classe 1: ', len(y_train.loc[y_train == 1]))
         print('quantidade de amostras da classe 2: ', len(y_train.loc[y_train == 2]))
-        ##print('quantidade de amostras da classe 3: ', len(y_train.loc[y_train == 3]))
+        print('quantidade de amostras da classe 3: ', len(y_train.loc[y_train == 3]))
 
 
         # Perceptron
@@ -221,12 +221,12 @@ def split_model():
 
 # chamada das funcoes
 
-ver_amostras_das_classes_status()
-ver_amostras_das_classes_regiao()
-ver_qtde_amostras_por_classe_status()
-ver_qtde_amostras_por_classe_regiao()
-ver_amostras_das_classes_progsaude()
-ver_qtde_amostras_por_classe_progsaude()
+##ver_amostras_das_classes_status()
+##ver_amostras_das_classes_regiao()
+##ver_qtde_amostras_por_classe_status()
+##ver_qtde_amostras_por_classe_regiao()
+##ver_amostras_das_classes_progsaude()
+##ver_qtde_amostras_por_classe_progsaude()
 
 
 
@@ -240,4 +240,4 @@ ver_qtde_amostras_por_classe_progsaude()
 
 # chamada ML
 
-##split_model()
+split_model()
