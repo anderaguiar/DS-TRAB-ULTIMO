@@ -40,12 +40,24 @@ map_data = {'R': 1, 'ER': 2, 'M': 3}
 df['STATUS'] = df['STATUS'].map(map_data)
 ##print('Alteracao de valores categóricos: \n', df.head(50))
 
-map_data_region = {'NORTE': 1, 'NORDESTE': 2, 'CENTRO-OESTE': 3, 'SUDESTE': 4, 'SUL': 5}
+# tratamento dos dados da regiao
+map_data_region = {'NORTE': 1, 'NORDESTE': 2, 'CENTRO-OESTE': 3, 'SUDESTE': 4, 'SUL': 5,
+                   'NORTE ': 1, 'NORDESTE ': 2, 'CENTRO-OESTE ': 3, 'SUDESTE ': 4, 'SUL ': 5}
 df['REGIAO'] = df['REGIAO'].map(map_data_region)
 ##print('Alteracao de valores categóricos: \n', df.head(50))
 
+# tratamento dos dados do pragama saude
 map_data_progsaude = {'COVID-19': 1, 'INFLUENZA': 2}
 df['PROGSAUDE'] = df['PROGSAUDE'].map(map_data_progsaude)
+##print('Alteracao de valores categóricos: \n', df.head(50))
+
+# tratamento dos dados do item
+map_data_item = {'DIFOSFATO DE CLOROQUINA 150MG': 1, 'DIFOSFATO DE CLOROQUINA 150MG ': 1, 
+                 'FOSFATO DE OSELTAMIVIR 30MG': 2, 'FOSFATO DE OSELTAMIVIR 30MG ': 2,  
+                 'FOSFATO DE OSELTAMIVIR 45MG': 3, 'FOSFATO DE OSELTAMIVIR 45MG ': 3,
+                 'FOSFATO DE OSELTAMIVIR 75MG': 4, 'FOSFATO DE OSELTAMIVIR 75MG ': 4,
+                 'HIDROXICLOROQUINA 200MG': 5, 'HIDROXICLOROQUINA 200MG ': 5}
+df['ITEM'] = df['ITEM'].map(map_data_item)
 ##print('Alteracao de valores categóricos: \n', df.head(50))
 
 # num e pandas
@@ -94,28 +106,26 @@ def ver_qtde_amostras_por_classe_regiao():
 
 
 # verifica se existe dados faltantes no conjunto de dados
-
-dt_feature = df.iloc[:, : -1]
-dt_target = df.iloc[:, -1]
+dt_feature = df.iloc[:, 6]
+dt_target = df.iloc[:,  3]
 dt_feature = dt_feature.mask(dt_feature == 1).fillna(dt_feature.mean)
 ##print('DT_FEATURE: ', dt_feature)
 ##print('DT_TARGET: ', dt_target)
 
 
-# plotando os dados - funcoes
+# plotando os dados histograma de classes
 def plot_hist():
-    #histograma de classes
-    plt.hist(df.iloc[:,1], color='b', width=.1)
-    plt.xlabel('Qtde. Amostras')
+    plt.hist(df.iloc[:,0], color='b', width=.1)
+    plt.xlabel('Qtde. Amostras por Região')
     plt.ylabel('Hist da Classe')
     plt.show()
 
-# histograma web offline [verificar erro na execucao]
+# histograma web offline
 def target_count():
-    trace = go.Bar(x = df['STATUS'].value_counts().values.tolist(),
-                y = ['saudaveis', 'diabeticos'],
+    trace = go.Bar(x = df['PROGSAUDE'].value_counts().values.tolist(),
+                y = ['COVID-19', 'INFLUENZA'],
                 orientation = 'v',
-                text = df['STATUS'].value_counts().values.tolist(),
+                text = df['PROGSAUDE'].value_counts().values.tolist(),
                 textfont = dict(size=15),
                 textposition = 'auto',
                 opacity = 0.8, marker=dict(color=['lightskyblue', 'gold'],
@@ -141,8 +151,8 @@ def bloxplot():
     ax.set_facecolor('#fafafa')
     ax.set(xlim=(-0.5, 200))
     plt.ylabel('quantidade')
-    plt.title('Overview Dataset')
-    ax = sns.boxplot(data=df, orient='v', palette='Set2')
+    plt.title('Distribuição dos Medicamentos')
+    ax = sns.boxplot(data=df['QTDE'], orient='v', palette='Set2')
     plt.show()
 
 
@@ -154,42 +164,43 @@ accuracy_PC = []
 accuracy_NB = []
 
 def split_model():
-
     for i in range(5):
         x_train, x_test, y_train, y_test = train_test_split(dt_feature, dt_target, test_size=0.3, random_state=1)
         print('divisao do conjunto de dados\n')
+        print('dt_feature: ', dt_feature)
+        print('dt_target: ', dt_target)
         print('x_train: %d\n y_train %d\n x_test %d\n y_test %d\n' %(len(x_train), len(y_train), len(x_test), len(y_test)))
         print('quantidade de amostras da classe 1: ', len(y_train.loc[y_train == 1]))
         print('quantidade de amostras da classe 2: ', len(y_train.loc[y_train == 2]))
         print('quantidade de amostras da classe 3: ', len(y_train.loc[y_train == 3]))
 
+
         # Perceptron
-        #percep = Perceptron(random_state=i)
-        ##percep = Perceptron()
-        ##percep.fit(x_train, y_train) #treinar em cima do conjunto de treinamento
-        ##percep.predictions = percep.predict(x_test) # testar pra mim
-        ##acc_percep = percep.score(x_test, y_test) # apresentar o resultado
+        percep = Perceptron()
+        percep.fit(x_train, y_train) #treinar em cima do conjunto de treinamento
+        percep.predictions = percep.predict(x_test) # testar pra mim
+        acc_percep = percep.score(x_test, y_test) # apresentar o resultado
 
         # Naive Bayes
-        ##gnb = GaussianNB() #criado o classificador
-        ##gnb.fit(x_train, y_train) # treinar o classificador
-        ##gnb.predictions = gnb.predict(x_test) #testar o classificador com o conjunto de test
-        ##acc_nb = gnb.score(x_test, y_test) # apresentar o resultado
+        gnb = GaussianNB() #criado o classificador
+        gnb.fit(x_train, y_train) # treinar o classificador
+        gnb.predictions = gnb.predict(x_test) #testar o classificador com o conjunto de test
+        acc_nb = gnb.score(x_test, y_test) # apresentar o resultado
 
         # Accuracy
-        ##accuracy_PC.append(acc_percep)
-        ##accuracy_NB.append(acc_nb)
+        accuracy_PC.append(acc_percep)
+        accuracy_NB.append(acc_nb)
 
-        ##print('\n Resultados Perceptron: \n Acc_Perceptron: ', acc_percep)
-        ##print('\n Resultados NB: \n Acc_Perceptron: ', acc_nb)
-        ##print(metrics.confusion_matrix(y_test, percep.predictions))
-        ##print('\n Classificacao: \n', metrics.classification_report(y_test, percep.predictions))
+        print('\n Resultados Perceptron: \n Acc_Perceptron: ', acc_percep)
+        print('\n Resultados NB: \n Acc_Perceptron: ', acc_nb)
+        print(metrics.confusion_matrix(y_test, percep.predictions))
+        print('\n Classificacao: \n', metrics.classification_report(y_test, percep.predictions))
 
-        ##print('\n Vetor de accuracia Peceptron: ', accuracy_PC)
-        ##print('\n Vetor de accuracia NB: ', accuracy_NB)
+        print('\n Vetor de accuracy Peceptron: ', accuracy_PC)
+        print('\n Vetor de accuracy NB: ', accuracy_NB)
 
-        ##median = np.mean(accuracy_PC)
-        ##print('Vetor accuracy_PC - Media: ', median)
+        median = np.mean(accuracy_PC)
+        print('Vetor accuracy_PC - Media: ', median)
 
 
 
