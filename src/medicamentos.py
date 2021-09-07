@@ -37,39 +37,36 @@ for i in file_names:
 # tratamento dos dados e mapeamento status
 # Remanejamento = 1
 # Entrega Realizada = 2
-# Remanejamento para Malaria = 3
-map_data_status = {'R': 1, 'ER': 2, 'M': 3}
+map_data_status = {'R': 1, 'ER': 2}
 df['STATUS'] = df['STATUS'].map(map_data_status)
-##print('Alteracao de valores categóricos: \n', df.head(50))
+print('Alteracao de valores categóricos: \n', df.head(50))
 
 # tratamento dos dados da regiao
-map_data_region = {'NORTE': 1, 'NORDESTE': 2, 'CENTRO-OESTE': 3, 'SUDESTE': 4, 'SUL': 5,
-                   'NORTE ': 1, 'NORDESTE ': 2, 'CENTRO-OESTE ': 3, 'SUDESTE ': 4, 'SUL ': 5}
-df['REGIAO'] = df['REGIAO'].map(map_data_region)
+##map_data_region = {'NORTE': 1, 'NORDESTE': 2, 'CENTRO-OESTE': 3, 'SUDESTE': 4, 'SUL': 5,
+##                   'NORTE ': 1, 'NORDESTE ': 2, 'CENTRO-OESTE ': 3, 'SUDESTE ': 4, 'SUL ': 5}
+##df['REGIAO'] = df['REGIAO'].map(map_data_region)
 ##print('Alteracao de valores categóricos: \n', df.head(50))
 
 # tratamento dos dados do pragama saude
-map_data_progsaude = {'COVID-19': 1, 'INFLUENZA': 2}
-df['PROGSAUDE'] = df['PROGSAUDE'].map(map_data_progsaude)
+##map_data_progsaude = {'COVID-19': 1, 'INFLUENZA': 2}
+##df['PROGSAUDE'] = df['PROGSAUDE'].map(map_data_progsaude)
 ##print('Alteracao de valores categóricos: \n', df.head(50))
 
 # tratamento dos dados do item
-map_data_item = {'DIFOSFATO DE CLOROQUINA 150MG': 1, 'DIFOSFATO DE CLOROQUINA 150MG ': 1, 
-                 'FOSFATO DE OSELTAMIVIR 30MG': 2, 'FOSFATO DE OSELTAMIVIR 30MG ': 2,  
-                 'FOSFATO DE OSELTAMIVIR 45MG': 3, 'FOSFATO DE OSELTAMIVIR 45MG ': 3,
-                 'FOSFATO DE OSELTAMIVIR 75MG': 4, 'FOSFATO DE OSELTAMIVIR 75MG ': 4,
-                 'HIDROXICLOROQUINA 200MG': 5, 'HIDROXICLOROQUINA 200MG ': 5}
-df['ITEM'] = df['ITEM'].map(map_data_item)
+##map_data_item = {'DIFOSFATO DE CLOROQUINA 150MG': 1, 'DIFOSFATO DE CLOROQUINA 150MG ': 1, 
+##                 'FOSFATO DE OSELTAMIVIR 30MG': 2, 'FOSFATO DE OSELTAMIVIR 30MG ': 2,  
+##                 'FOSFATO DE OSELTAMIVIR 45MG': 3, 'FOSFATO DE OSELTAMIVIR 45MG ': 3,
+##                 'FOSFATO DE OSELTAMIVIR 75MG': 4, 'FOSFATO DE OSELTAMIVIR 75MG ': 4,
+##                 'HIDROXICLOROQUINA 200MG': 5, 'HIDROXICLOROQUINA 200MG ': 5}
+##df['ITEM'] = df['ITEM'].map(map_data_item)
 ##print('Alteracao de valores categóricos: \n', df.head(50))
 
 # num e pandas
 def ver_amostras_das_classes_status():
     sample_1 = np.where(df.loc[df['STATUS'] == 1])
     sample_2 = np.where(df.loc[df['STATUS'] == 2])
-    sample_3 = np.where(df.loc[df['STATUS'] == 3])
     print('\nAmostra da classe 1 - Remanejamento: ', sample_1)
-    print('\nAmostra da classe 2 - Entrega realizada: ', sample_2)
-    print('\nAmostra da classe 3 - Remanejamento Malaria: ', sample_3)
+    print('\nAmostra da classe 2 - Entrega Realizada: ', sample_2)
 
 # num e pandas
 def ver_amostras_das_classes_regiao():
@@ -98,7 +95,6 @@ def ver_qtde_amostras_por_classe_status():
     vl_remanejamento_malaria = len(df.loc[df['STATUS'] == 3])
     print('\nAmostra da classe 1 - Remanejamento: ', vl_remanejamento)
     print('\nAmostra da classe 2 - Entrega Realizada: ', vl_entrega_realizada)
-    print('\nAmostra da classe 3 - Remanejamento Malaria: ', vl_remanejamento_malaria)
 
 # qtde das amostras por classe regiao
 def ver_qtde_amostras_por_classe_regiao():
@@ -122,11 +118,11 @@ def ver_qtde_amostras_por_classe_progsaude():
 
 
 # conjunto de dados
-dt_feature = df.iloc[:, 4]
-dt_target = df.iloc[:, 3]
-dt_feature = dt_feature.mask(dt_feature == 1).fillna(dt_feature.mean)
-##print('DT_FEATURE: ', dt_feature)
-##print('DT_TARGET: ', dt_target)
+dt_feature = df.iloc[:, :-1]
+dt_target = df.iloc[:,-1]
+
+print('DT_FEATURE: ', dt_feature)
+print('DT_TARGET: ', dt_target)
 
 
 # plotando os dados histograma de classes
@@ -139,7 +135,7 @@ def plot_hist():
 # histograma web offline
 def target_count():
     trace = go.Bar(x = df['PROGSAUDE'].value_counts().values.tolist(),
-                y = ['COVID-19', 'INFLUENZA'],
+                y = [1, 2],
                 orientation = 'v',
                 text = df['PROGSAUDE'].value_counts().values.tolist(),
                 textfont = dict(size=15),
@@ -181,21 +177,17 @@ accuracy_NB = []
 
 def split_model():
     for i in range(5):
-        x_train, x_test, y_train, y_test = train_test_split(dt_feature, dt_target, test_size=0.3, random_state=1)
-        print('divisao do conjunto de dados\n')
-        print('dt_feature: ', dt_feature)
-        print('dt_target: ', dt_target)
-        print('x_train: %d\n y_train %d\n x_test %d\n y_test %d\n' %(len(x_train), len(y_train), len(x_test), len(y_test)))
-        print('quantidade de amostras da classe 1: ', len(y_train.loc[y_train == 1]))
-        print('quantidade de amostras da classe 2: ', len(y_train.loc[y_train == 2]))
-        print('quantidade de amostras da classe 3: ', len(y_train.loc[y_train == 3]))
-
+        x_train, x_test, y_train, y_test = train_test_split(dt_feature, dt_target, test_size=0.3, random_state=i)
+        print('Divisão do conjunto de dados\n')
+        print('X_train: %d\ny_train: %d\nX_test: %d\ny_test: %d\n' %(len(x_train), len(y_train), len(x_test), len(y_test)))
+        print('Quantidade de amostras da classe 1: ', len(y_train.loc[y_train == 1]))
+        print('Quantidade de amostras da classe 2: ', len(y_train.loc[y_train == 2]))
 
         # Perceptron
         percep = Perceptron()
-        percep.fit(x_train, y_train) #treinar em cima do conjunto de treinamento
-        percep.predictions = percep.predict(x_test) # testar pra mim
-        acc_percep = percep.score(x_test, y_test) # apresentar o resultado
+        percep.fit(x_train, y_train)
+        percep.predictions = percep.predict(x_test)
+        acc_percep = percep.score(x_test, y_test)
 
         # Naive Bayes
         gnb = GaussianNB() #criado o classificador
@@ -240,4 +232,4 @@ def split_model():
 
 # chamada ML
 
-##split_model()
+split_model()
